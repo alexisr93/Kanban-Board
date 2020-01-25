@@ -1,0 +1,10 @@
+body {
+  background: #20262E;
+  padding: 20px;
+  font-family: Helvetica;
+}
+
+#kanban-column-options {
+  padding-top: 20px;
+  padding-left: 35px;
+}
