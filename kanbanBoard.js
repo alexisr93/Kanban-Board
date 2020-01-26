@@ -13,6 +13,7 @@ class KanbanNote extends React.Component {
 
 	handleMove(event) {
 		let toColumn = event.target.getAttribute('value');
+		if (this.state.kanban_column_id === toColumn) return;
 		this.props.onMove(this.state.kanban_note_id, this.state.kanban_column_id, toColumn);
 	}
 
@@ -32,9 +33,24 @@ class KanbanNote extends React.Component {
 		if (isActive === "left") {
 			buttons = (
 				<div className="nav justify-content-end">
-					<a className="btn btn-outline-secondary active" href="#" value="left" onClick={this.handleMove}></a>
-					<a className="btn btn-outline-secondary" href="#" value="center" onClick={this.handleMove}></a>
-					<a className="btn btn-outline-secondary" href="#" value="right" onClick={this.handleMove}></a>
+					<a
+						className="btn btn-outline-secondary active"
+						href="#"
+						value="left"
+						onClick={this.handleMove}>
+					</a>
+					<a
+						className="btn btn-outline-secondary"
+						href="#"
+						value="center"
+						onClick={this.handleMove}>
+					</a>
+					<a
+						className="btn btn-outline-secondary"
+						href="#"
+						value="right"
+						onClick={this.handleMove}>
+					</a>
 				</div>
 			);
 		}
@@ -42,9 +58,23 @@ class KanbanNote extends React.Component {
 		if (isActive === "center") {
 			buttons = (
 				<div className="nav justify-content-end">
-					<a className="btn btn-outline-secondary" href="#" value="left" onClick={this.handleMove}></a>
-					<a className="btn btn-outline-secondary active" href="#" value="center" onClick={this.handleMove}></a>
-					<a className="btn btn-outline-secondary" href="#" value="right" onClick={this.handleMove}></a>
+					<a
+						className="btn btn-outline-secondary"
+						href="#"
+						value="left"
+						onClick={this.handleMove}>
+					</a>
+					<a
+						className="btn btn-outline-secondary active"
+						href="#"
+						value="center"
+						onClick={this.handleMove}></a>
+					<a
+						className="btn btn-outline-secondary"
+						href="#"
+						value="right"
+						onClick={this.handleMove}>
+					</a>
 				</div>
 			);
 		}
@@ -52,9 +82,24 @@ class KanbanNote extends React.Component {
 		if (isActive === "right") {
 			buttons = (
 				<div className="nav justify-content-end">
-					<a className="btn btn-outline-secondary" href="#" value="left" onClick={this.handleMove}></a>
-					<a className="btn btn-outline-secondary" href="#" value="center" onClick={this.handleMove}></a>
-					<a className="btn btn-outline-secondary active" href="#" value="right" onClick={this.handleMove}></a>
+					<a
+						className="btn btn-outline-secondary"
+						href="#"
+						value="left"
+						onClick={this.handleMove}>
+					</a>
+					<a
+						className="btn btn-outline-secondary"
+						href="#"
+						value="center"
+						onClick={this.handleMove}>
+					</a>
+					<a
+						className="btn btn-outline-secondary active"
+						href="#"
+						value="right"
+						onClick={this.handleMove}>
+					</a>
 				</div>
 			);
 		}
@@ -144,6 +189,7 @@ class KanbanColumn extends React.Component {
 
 	handleMove(id, fromColumn, toColumn) {
 		this.props.onMove(id, fromColumn, toColumn);
+
 	}
 
 	handleClick() {
@@ -194,18 +240,25 @@ class KanbanColumn extends React.Component {
 class KanbanBoard extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			columns: [<KanbanColumn key="left" columnId="left" title="Todo" onMove={this.handleMove}></KanbanColumn>,
+								<KanbanColumn key="center" columnId="center" title="Pending" onMove={this.handleMove}></KanbanColumn>,
+								<KanbanColumn key="right" columnId="right" title="Done" onMove={this.handleMove}></KanbanColumn>
+							],
+			note_moving: null
+		}
 	}
 
 	handleMove(id, fromColumn, toColumn) {
 		console.log(id + " " + fromColumn + " " + toColumn);
+		console.log(fromColumn.state.notes_in_column);
+
 	}
 	render() {
   	return (
     	<div className="container">
 				<div className="row">
-					<KanbanColumn key="left" columnId="left" title="Todo" onMove={this.handleMove}></KanbanColumn>
-					<KanbanColumn key="center" columnId="center" title="Pending" onMove={this.handleMove}></KanbanColumn>
-					<KanbanColumn key="right" columnId="right" title="Done" onMove={this.handleMove}></KanbanColumn>
+					{this.state.columns.map(item => item)}
 				</div>
       </div>
     );
