@@ -2,7 +2,7 @@ class KanbanNote extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			kanban_note_text: "",
+			kanban_note_text: this.props.noteText,
 			kanban_note_id: this.props.id,
 			kanban_column_id: this.props.columnId
 		}
@@ -14,7 +14,7 @@ class KanbanNote extends React.Component {
 	handleMove(event) {
 		let toColumn = event.target.getAttribute('value');
 		if (this.state.kanban_column_id === toColumn) return;
-		this.props.onMove(this.state.kanban_note_id, this.state.kanban_column_id, toColumn);
+		this.props.onMove(this.state.kanban_note_id, this.state.kanban_note_text, toColumn);
 	}
 
 	handleChange() {
@@ -26,6 +26,7 @@ class KanbanNote extends React.Component {
 	handleDelete() {
 		this.props.onDelete(this.state.kanban_note_id);
 	}
+
   render() {
 		let isActive = this.state.kanban_column_id;
 		let buttons = "";
@@ -180,41 +181,28 @@ class KanbanColumn extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			notes_in_column: [],
+			notes_in_column: this.props.notes.filter(note => note.column == this.props.columnId),
 		}
-		this.handleClick = this.handleClick.bind(this);
-		this.handleDelete = this.handleDelete.bind(this);
-		this.handleMove = this.handleMove.bind(this);
+		this.handleNewNote = this.handleNewNote.bind(this);
 	}
 
-	handleMove(id, fromColumn, toColumn) {
-		this.props.onMove(id, fromColumn, toColumn);
+	componentDidUpdate(prevProps){
+		if (this.props.notes !== prevProps.notes){
+			this.setState({
+				notes_in_column: this.props.notes.filter(note => note.column == this.props.columnId)
+			});
+		}
+	}
+
+	handleNewNote() {
+		this.props.newNote(this.props.columnId);
+
+		//this.setState({
+		//	notes_in_column: this.props.notes.filter(note => note.column == this.props.columnId)
+		//});
 
 	}
 
-	handleClick() {
-		let new_note_key = Date.now() + this.state.notes_in_column.length + 1;
-		// You probably shouldn't build the element here.
-		let new_note_object = { element: <KanbanNote
-																				key={new_note_key}
-																				id={new_note_key}
-																				columnId={this.props.columnId}
-																				onDelete={this.handleDelete}
-																				onMove={this.handleMove}>
-																			</KanbanNote>,
-														key: new_note_key
-													}
-		this.setState({
-			notes_in_column: [...this.state.notes_in_column, new_note_object]
-		});
-	}
-
-	handleDelete(id) {
-		console.log(id);
-		this.setState({
-			notes_in_column: this.state.notes_in_column.filter(note => note.key != id)
-		});
-	}
 
 	render() {
 		let notes = this.state.notes_in_column.map(note => note.element);
@@ -227,7 +215,7 @@ class KanbanColumn extends React.Component {
 						<a
 							href="#"
 							className="btn btn-outline-primary"
-							onClick={this.handleClick}>
+							onClick={this.handleNewNote}>
 							New Note
 						</a>
 					</div>
@@ -241,24 +229,77 @@ class KanbanBoard extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			columns: [<KanbanColumn key="left" columnId="left" title="Todo" onMove={this.handleMove}></KanbanColumn>,
-								<KanbanColumn key="center" columnId="center" title="Pending" onMove={this.handleMove}></KanbanColumn>,
-								<KanbanColumn key="right" columnId="right" title="Done" onMove={this.handleMove}></KanbanColumn>
-							],
-			note_moving: null
+			notes: [],
+			columns: [],
 		}
+
+		this.handleNewNote = this.handleNewNote.bind(this);
+		this.handleDelete = this.handleDelete.bind(this);
+		this.handleMove = this.handleMove.bind(this);
 	}
 
-	handleMove(id, fromColumn, toColumn) {
-		console.log(id + " " + fromColumn + " " + toColumn);
-		console.log(fromColumn.state.notes_in_column);
-
+	handleMove(id, noteText, toColumn) {
+		this.handleDelete(id);
+		console.log(this.state.notes);
+		//this.handleNewNote(toColumn, noteText);
+		console.log(this.state.notes);
 	}
+
+	handleDelete(id) {
+		console.log("I am here");
+		console.log(id);
+		this.setState({
+			notes: this.state.notes.filter(note => note.key != id)
+		});
+		console.log("I am at the end");
+	}
+
+	handleNewNote(inColumn, note_text) {
+		let new_note_key = Date.now();
+		let new_note_object = { element: <KanbanNote
+																				key={new_note_key}
+																				noteText={note_text}
+																				id={new_note_key}
+																				columnId={inColumn}
+																				onDelete={this.handleDelete}
+																				onMove={this.handleMove}>
+																			</KanbanNote>,
+														key: new_note_key,
+														column: inColumn
+													}
+		this.setState({
+			notes: [...this.state.notes, new_note_object]
+		});
+	}
+
 	render() {
   	return (
     	<div className="container">
 				<div className="row">
-					{this.state.columns.map(item => item)}
+					<KanbanColumn
+						key="left"
+						columnId="left"
+						title="Todo"
+						onMove={this.handleMove}
+						newNote={this.handleNewNote}
+						notes={this.state.notes}>
+					</KanbanColumn>
+					<KanbanColumn
+						key="center"
+						columnId="center"
+						title="Pending"
+						onMove={this.handleMove}
+						newNote={this.handleNewNote}
+						notes={this.state.notes}>
+					</KanbanColumn>
+					<KanbanColumn
+						key="right"
+						columnId="right"
+						title="Done"
+						onMove={this.handleMove}
+						newNote={this.handleNewNote}
+						notes={this.state.notes}>
+					</KanbanColumn>
 				</div>
       </div>
     );
