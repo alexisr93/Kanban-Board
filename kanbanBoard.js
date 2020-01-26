@@ -239,19 +239,29 @@ class KanbanBoard extends React.Component {
 	}
 
 	handleMove(id, noteText, toColumn) {
-		this.handleDelete(id);
-		console.log(this.state.notes);
-		//this.handleNewNote(toColumn, noteText);
-		console.log(this.state.notes);
+		let new_note_key = Date.now();
+		let new_note_object = { element: <KanbanNote
+																				key={new_note_key}
+																				noteText={noteText}
+																				id={new_note_key}
+																				columnId={toColumn}
+																				onDelete={this.handleDelete}
+																				onMove={this.handleMove}>
+																			</KanbanNote>,
+														key: new_note_key,
+														column: toColumn
+													}
+		this.setState({
+			notes: [...this.state.notes.filter(note => note.key != id), new_note_object]
+		});
+
 	}
 
 	handleDelete(id) {
-		console.log("I am here");
-		console.log(id);
 		this.setState({
 			notes: this.state.notes.filter(note => note.key != id)
 		});
-		console.log("I am at the end");
+
 	}
 
 	handleNewNote(inColumn, note_text) {
