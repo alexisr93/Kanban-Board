@@ -196,28 +196,24 @@ class KanbanColumn extends React.Component {
 
 	handleNewNote() {
 		this.props.newNote(this.props.columnId);
-
-		//this.setState({
-		//	notes_in_column: this.props.notes.filter(note => note.column == this.props.columnId)
-		//});
-
 	}
-
 
 	render() {
 		let notes = this.state.notes_in_column.map(note => note.element);
   	return (
-    	<div className="col-md-4">
-				<h5 className="text-center">{this.props.title}</h5>
-				{notes}
-				<div className="row" id="kanban-column-options">
-					<div className="col text-center">
-						<a
-							href="#"
-							className="btn btn-outline-primary"
-							onClick={this.handleNewNote}>
-							New Note
-						</a>
+    	<div className="col-md-4 col-lg-2">
+				<div className="bg-light px-2 pt-2 pb-3 rounded-lg">
+					<h5 className="text-center font-weight-normal">{this.props.title}</h5>
+					{notes}
+					<div className="row" id="kanban-column-options">
+						<div className="col text-center">
+							<a
+								href="#"
+								className="btn btn-outline-primary"
+								onClick={this.handleNewNote}>
+								New Note
+							</a>
+						</div>
 					</div>
 				</div>
       </div>
@@ -284,8 +280,8 @@ class KanbanBoard extends React.Component {
 
 	render() {
   	return (
-    	<div className="container">
-				<div className="row">
+    	<div className="container-fluid">
+				<div className="row justify-content-center">
 					<KanbanColumn
 						key="left"
 						columnId="left"
