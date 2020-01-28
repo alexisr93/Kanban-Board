@@ -300,21 +300,27 @@ class KanbanBoard extends React.Component {
 
 	localStorageSet() {
 		let notes_to_store = JSON.stringify(this.state.notes, (key, value) => {
-			if (key === "element") {
-				return value;
+			if (typeof value === 'function') {
+				return value.toString();
 			}
 			return value;
 		});
-
+		console.log(notes_to_store);
 		localStorage.setItem("notes", notes_to_store);
 	}
 
 	localStorageGet() {
 		if (localStorage.getItem("notes") != null) {
 			this.setState({
-				notes: JSON.parse(localStorage.getItem("notes"))
+				notes: JSON.parse(localStorage.getItem("notes"), (key, value) => {
+					if (key === "onMove") return this.handleMove;
+					if (key === "onDelete") return this.handleDelete;
+					return value;
+				})
 			});
 		}
+		console.log("After get");
+		console.log(this.state.notes);
 	}
 
 	render() {
