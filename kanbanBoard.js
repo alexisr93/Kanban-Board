@@ -199,7 +199,6 @@ class KanbanColumn extends React.Component {
 	}
 
 	render() {
-		console.log(this.state.notes_in_column);
 		let notes = this.state.notes_in_column.map(note => (
 			<KanbanNote
 				key={note.element.key}
@@ -305,7 +304,6 @@ class KanbanBoard extends React.Component {
 			}
 			return value;
 		});
-		console.log(notes_to_store);
 		localStorage.setItem("notes", notes_to_store);
 	}
 
@@ -319,8 +317,6 @@ class KanbanBoard extends React.Component {
 				})
 			});
 		}
-		console.log("After get");
-		console.log(this.state.notes);
 	}
 
 	render() {
