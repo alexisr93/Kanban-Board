@@ -199,7 +199,17 @@ class KanbanColumn extends React.Component {
 	}
 
 	render() {
-		let notes = this.state.notes_in_column.map(note => note.element);
+		console.log(this.state.notes_in_column);
+		let notes = this.state.notes_in_column.map(note => (
+			<KanbanNote
+				key={note.element.key}
+				noteText={note.element.noteText}
+				id={note.element.id}
+				columnId={note.element.columnId}
+				onDelete={note.element.onDelete}
+				onMove={note.element.onMove}>
+			</KanbanNote>
+		));
   	return (
     	<div className="col-md-4 col-lg-2">
 				<div className="bg-light px-2 pt-2 pb-3 rounded-lg">
@@ -233,22 +243,27 @@ class KanbanBoard extends React.Component {
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleMove = this.handleMove.bind(this);
 	}
-
+	componentDidMount() {
+		this.localStorageGet()
+	}
 	handleMove(id, noteText, toColumn) {
 		let new_note_key = Date.now();
-		let new_note_object = { element: <KanbanNote
-																				key={new_note_key}
-																				noteText={noteText}
-																				id={new_note_key}
-																				columnId={toColumn}
-																				onDelete={this.handleDelete}
-																				onMove={this.handleMove}>
-																			</KanbanNote>,
-														key: new_note_key,
-														column: toColumn
-													}
+		let new_note_object = {
+			element: {
+				key: new_note_key,
+				noteText: noteText,
+				id: new_note_key,
+				columnId: toColumn,
+				onDelete: this.handleDelete,
+				onMove: this.handleMove
+			},
+			key: new_note_key,
+			column: toColumn
+		}
 		this.setState({
 			notes: [...this.state.notes.filter(note => note.key != id), new_note_object]
+		}, () => {
+			this.localStorageSet();
 		});
 
 	}
@@ -256,26 +271,50 @@ class KanbanBoard extends React.Component {
 	handleDelete(id) {
 		this.setState({
 			notes: this.state.notes.filter(note => note.key != id)
+		}, () => {
+			this.localStorageSet();
 		});
 
 	}
 
-	handleNewNote(inColumn, note_text) {
+	handleNewNote(inColumn, noteText) {
 		let new_note_key = Date.now();
-		let new_note_object = { element: <KanbanNote
-																				key={new_note_key}
-																				noteText={note_text}
-																				id={new_note_key}
-																				columnId={inColumn}
-																				onDelete={this.handleDelete}
-																				onMove={this.handleMove}>
-																			</KanbanNote>,
-														key: new_note_key,
-														column: inColumn
-													}
+		let new_note_object = {
+			element: {
+				key: new_note_key,
+				noteText: noteText,
+				id: new_note_key,
+				columnId: inColumn,
+				onDelete: this.handleDelete,
+				onMove: this.handleMove
+			},
+			key: new_note_key,
+			column: inColumn
+		}
 		this.setState({
 			notes: [...this.state.notes, new_note_object]
+		}, () => {
+			this.localStorageSet();
 		});
+	}
+
+	localStorageSet() {
+		let notes_to_store = JSON.stringify(this.state.notes, (key, value) => {
+			if (key === "element") {
+				return value;
+			}
+			return value;
+		});
+
+		localStorage.setItem("notes", notes_to_store);
+	}
+
+	localStorageGet() {
+		if (localStorage.getItem("notes") != null) {
+			this.setState({
+				notes: JSON.parse(localStorage.getItem("notes"))
+			});
+		}
 	}
 
 	render() {
