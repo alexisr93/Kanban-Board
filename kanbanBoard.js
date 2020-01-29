@@ -2,9 +2,9 @@ class KanbanNote extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			kanban_note_text: this.props.noteText,
-			kanban_note_id: this.props.id,
-			kanban_column_id: this.props.columnId
+			note_text: this.props.noteText,
+			note_id: this.props.id,
+			column_id: this.props.columnId
 		}
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -13,22 +13,22 @@ class KanbanNote extends React.Component {
 
 	handleMove(event) {
 		let toColumn = event.target.getAttribute('value');
-		if (this.state.kanban_column_id === toColumn) return;
-		this.props.onMove(this.state.kanban_note_id, this.state.kanban_note_text, toColumn);
+		if (this.state.column_id === toColumn) return;
+		this.props.onMove(this.state.note_id, this.state.note_text, toColumn);
 	}
 
 	handleChange() {
 		this.setState({
-			kanban_note_text: event.target.value
+			note_text: event.target.value
 		});
 	}
 
 	handleDelete() {
-		this.props.onDelete(this.state.kanban_note_id);
+		this.props.onDelete(this.state.note_id);
 	}
 
   render() {
-		let isActive = this.state.kanban_column_id;
+		let isActive = this.state.column_id;
 		let buttons = "";
 
 		if (isActive === "left") {
@@ -115,7 +115,7 @@ class KanbanNote extends React.Component {
 									href="#"
 									className="btn btn-outline-primary"
 									data-toggle="modal"
-									data-target={"#" + "editNoteModal" + this.state.kanban_note_id}>
+									data-target={"#" + "editNoteModal" + this.state.note_id}>
 								</a>
 								<a
 									href="#"
@@ -133,24 +133,24 @@ class KanbanNote extends React.Component {
 					<div className="containter-fluid">
 						<div className="row">
 							<div className="col">
-							{this.state.kanban_note_text}
+							{this.state.note_text}
 							</div>
 						</div>
 					</div>
 				</div>
 
 				<div
-					className="modal fade" id={"editNoteModal" + this.state.kanban_note_id}
+					className="modal fade" id={"editNoteModal" + this.state.note_id}
 					tabIndex="-1"
 					role="dialog"
-					aria-labelledby={"editNoteModalLabel" + this.state.kanban_note_id}
+					aria-labelledby={"editNoteModalLabel" + this.state.note_id}
 					aria-hidden="true">
 				  <div className="modal-dialog" role="document">
 				    <div className="modal-content">
 				      <div className="modal-header">
 				        <h5
 									className="modal-title"
-									id={"editNoteModalLabel" + this.state.kanban_note_id}>
+									id={"editNoteModalLabel" + this.state.note_id}>
 									Edit Note
 								</h5>
 				        <button
@@ -165,7 +165,7 @@ class KanbanNote extends React.Component {
 					      <div className="modal-body">
 					      	<textarea
 										className="form-control"
-										value={this.state.kanban_note_text}
+										value={this.state.note_text}
 										onChange={this.handleChange}></textarea>
 					      </div>
 							</form>
@@ -181,7 +181,7 @@ class KanbanColumn extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			notes_in_column: this.props.notes.filter(note => note.column == this.props.columnId),
+			notes_in_column: this.props.notes.filter(note => note.columnId == this.props.columnId),
 		}
 		this.handleNewNote = this.handleNewNote.bind(this);
 	}
@@ -189,24 +189,24 @@ class KanbanColumn extends React.Component {
 	componentDidUpdate(prevProps){
 		if (this.props.notes !== prevProps.notes){
 			this.setState({
-				notes_in_column: this.props.notes.filter(note => note.column == this.props.columnId)
+				notes_in_column: this.props.notes.filter(note => note.columnId == this.props.columnId)
 			});
 		}
 	}
 
 	handleNewNote() {
-		this.props.newNote(this.props.columnId);
+		this.props.newNote(this.props.columnId, " ");
 	}
 
 	render() {
 		let notes = this.state.notes_in_column.map(note => (
 			<KanbanNote
-				key={note.element.key}
-				noteText={note.element.noteText}
-				id={note.element.id}
-				columnId={note.element.columnId}
-				onDelete={note.element.onDelete}
-				onMove={note.element.onMove}>
+				key={note.key}
+				noteText={note.noteText}
+				id={note.id}
+				columnId={note.columnId}
+				onDelete={note.onDelete}
+				onMove={note.onMove}>
 			</KanbanNote>
 		));
   	return (
@@ -242,23 +242,22 @@ class KanbanBoard extends React.Component {
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleMove = this.handleMove.bind(this);
 	}
+
 	componentDidMount() {
 		this.localStorageGet()
 	}
+
 	handleMove(id, noteText, toColumn) {
 		let new_note_key = Date.now();
 		let new_note_object = {
-			element: {
-				key: new_note_key,
-				noteText: noteText,
-				id: new_note_key,
-				columnId: toColumn,
-				onDelete: this.handleDelete,
-				onMove: this.handleMove
-			},
 			key: new_note_key,
-			column: toColumn
+			noteText: noteText,
+			id: new_note_key,
+			columnId: toColumn,
+			onDelete: this.handleDelete,
+			onMove: this.handleMove,
 		}
+
 		this.setState({
 			notes: [...this.state.notes.filter(note => note.key != id), new_note_object]
 		}, () => {
@@ -279,17 +278,14 @@ class KanbanBoard extends React.Component {
 	handleNewNote(inColumn, noteText) {
 		let new_note_key = Date.now();
 		let new_note_object = {
-			element: {
-				key: new_note_key,
-				noteText: noteText,
-				id: new_note_key,
-				columnId: inColumn,
-				onDelete: this.handleDelete,
-				onMove: this.handleMove
-			},
 			key: new_note_key,
-			column: inColumn
+			noteText: noteText,
+			id: new_note_key,
+			columnId: inColumn,
+			onDelete: this.handleDelete,
+			onMove: this.handleMove,
 		}
+
 		this.setState({
 			notes: [...this.state.notes, new_note_object]
 		}, () => {
