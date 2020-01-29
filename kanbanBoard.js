@@ -18,8 +18,8 @@ class KanbanNote extends React.Component {
 	}
 
 	handleChange() {
-		this.setState({
-			note_text: event.target.value
+		this.setState({note_text: event.target.value}, () => {
+			this.props.onUpdate(this.state.note_id, this.state.note_text);
 		});
 	}
 
@@ -195,7 +195,7 @@ class KanbanColumn extends React.Component {
 	}
 
 	handleNewNote() {
-		this.props.newNote(this.props.columnId, " ");
+		this.props.newNote(this.props.columnId, "");
 	}
 
 	render() {
@@ -206,7 +206,8 @@ class KanbanColumn extends React.Component {
 				id={note.id}
 				columnId={note.columnId}
 				onDelete={note.onDelete}
-				onMove={note.onMove}>
+				onMove={note.onMove}
+				onUpdate={note.onUpdate}>
 			</KanbanNote>
 		));
   	return (
@@ -241,6 +242,9 @@ class KanbanBoard extends React.Component {
 		this.handleNewNote = this.handleNewNote.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleMove = this.handleMove.bind(this);
+		this.handleUpdate = this.handleUpdate.bind(this);
+		this.localStorageSet = this.localStorageSet.bind(this);
+		this.localStorageGet = this.localStorageGet.bind(this);
 	}
 
 	componentDidMount() {
@@ -256,6 +260,7 @@ class KanbanBoard extends React.Component {
 			columnId: toColumn,
 			onDelete: this.handleDelete,
 			onMove: this.handleMove,
+			onUpdate: this.handleUpdate
 		}
 
 		this.setState({
@@ -275,6 +280,19 @@ class KanbanBoard extends React.Component {
 
 	}
 
+	handleUpdate(id, note_text) {
+		this.setState({
+			notes: [...this.state.notes.map(note => {
+				if (note.id === id) {
+					note.noteText = note_text;
+				}
+				return note;
+			})]}, () => {
+			this.localStorageSet();
+		});
+
+	}
+
 	handleNewNote(inColumn, noteText) {
 		let new_note_key = Date.now();
 		let new_note_object = {
@@ -284,11 +302,11 @@ class KanbanBoard extends React.Component {
 			columnId: inColumn,
 			onDelete: this.handleDelete,
 			onMove: this.handleMove,
+			onUpdate: this.handleUpdate
 		}
 
 		this.setState({
-			notes: [...this.state.notes, new_note_object]
-		}, () => {
+			notes: [...this.state.notes, new_note_object]}, () => {
 			this.localStorageSet();
 		});
 	}
@@ -300,6 +318,7 @@ class KanbanBoard extends React.Component {
 			}
 			return value;
 		});
+
 		localStorage.setItem("notes", notes_to_store);
 	}
 
@@ -309,6 +328,7 @@ class KanbanBoard extends React.Component {
 				notes: JSON.parse(localStorage.getItem("notes"), (key, value) => {
 					if (key === "onMove") return this.handleMove;
 					if (key === "onDelete") return this.handleDelete;
+					if (key === "onUpdate") return this.handleUpdate;
 					return value;
 				})
 			});
@@ -331,7 +351,6 @@ class KanbanBoard extends React.Component {
 						key="center"
 						columnId="center"
 						title="Pending"
-						onMove={this.handleMove}
 						newNote={this.handleNewNote}
 						notes={this.state.notes}>
 					</KanbanColumn>
@@ -339,7 +358,6 @@ class KanbanBoard extends React.Component {
 						key="right"
 						columnId="right"
 						title="Done"
-						onMove={this.handleMove}
 						newNote={this.handleNewNote}
 						notes={this.state.notes}>
 					</KanbanColumn>
