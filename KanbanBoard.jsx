@@ -12,9 +12,9 @@ class KanbanNote extends React.Component {
 	}
 
 	handleMove(event) {
-		let toColumn = event.target.getAttribute('value');
-		if (this.state.column_id === toColumn) return;
-		this.props.onMove(this.state.note_id, this.state.note_text, toColumn);
+		let to_column = event.target.getAttribute('value');
+		if (this.state.column_id === to_column) return;
+		this.props.onMove(this.state.note_id, this.state.note_text, to_column);
 	}
 
 	handleChange() {
@@ -28,78 +28,88 @@ class KanbanNote extends React.Component {
 	}
 
   render() {
-		let isActive = this.state.column_id;
+		let is_active = this.state.column_id;
 		let buttons = "";
 
-		if (isActive === "left") {
+		if (is_active === "left") {
 			buttons = (
 				<div className="nav justify-content-end">
 					<a
 						className="btn btn-outline-secondary active"
 						href="#"
 						value="left"
-						onClick={this.handleMove}>
+						onClick={this.handleMove}
+					>
 					</a>
 					<a
 						className="btn btn-outline-secondary"
 						href="#"
 						value="center"
-						onClick={this.handleMove}>
+						onClick={this.handleMove}
+					>
 					</a>
 					<a
 						className="btn btn-outline-secondary"
 						href="#"
 						value="right"
-						onClick={this.handleMove}>
+						onClick={this.handleMove}
+					>
 					</a>
 				</div>
 			);
 		}
 
-		if (isActive === "center") {
+		if (is_active === "center") {
 			buttons = (
 				<div className="nav justify-content-end">
 					<a
 						className="btn btn-outline-secondary"
 						href="#"
 						value="left"
-						onClick={this.handleMove}>
+						onClick={this.handleMove}
+					>
 					</a>
 					<a
 						className="btn btn-outline-secondary active"
 						href="#"
 						value="center"
-						onClick={this.handleMove}></a>
+						onClick={this.handleMove}
+					>
+					</a>
 					<a
 						className="btn btn-outline-secondary"
 						href="#"
 						value="right"
-						onClick={this.handleMove}>
+						onClick={this.handleMove}
+					>
 					</a>
 				</div>
 			);
 		}
 
-		if (isActive === "right") {
+		if (is_active === "right") {
 			buttons = (
 				<div className="nav justify-content-end">
 					<a
 						className="btn btn-outline-secondary"
 						href="#"
 						value="left"
-						onClick={this.handleMove}>
+						onClick={this.handleMove}
+					>
 					</a>
 					<a
 						className="btn btn-outline-secondary"
 						href="#"
 						value="center"
-						onClick={this.handleMove}>
+						onClick={this.handleMove}
+					>
 					</a>
 					<a
 						className="btn btn-outline-secondary active"
 						href="#"
 						value="right"
-						onClick={this.handleMove}>
+						onClick={this.handleMove}
+					>
 					</a>
 				</div>
 			);
@@ -115,12 +125,14 @@ class KanbanNote extends React.Component {
 									href="#"
 									className="btn btn-outline-primary"
 									data-toggle="modal"
-									data-target={"#" + "editNoteModal" + this.state.note_id}>
+									data-target={"#" + "editNoteModal" + this.state.note_id}
+								>
 								</a>
 								<a
 									href="#"
 									className="btn btn-outline-danger"
-									onClick={this.handleDelete}>
+									onClick={this.handleDelete}
+								>
 								</a>
 							</div>
 						</div>
@@ -157,7 +169,8 @@ class KanbanNote extends React.Component {
 									type="button"
 									className="close"
 									data-dismiss="modal"
-									aria-label="Close">
+									aria-label="Close"
+								>
 				          <span aria-hidden="true">&times;</span>
 				        </button>
 				      </div>
@@ -166,7 +179,9 @@ class KanbanNote extends React.Component {
 					      	<textarea
 										className="form-control"
 										value={this.state.note_text}
-										onChange={this.handleChange}></textarea>
+										onChange={this.handleChange}
+									>
+									</textarea>
 					      </div>
 							</form>
 				    </div>
@@ -207,7 +222,8 @@ class KanbanColumn extends React.Component {
 				columnId={note.columnId}
 				onDelete={note.onDelete}
 				onMove={note.onMove}
-				onUpdate={note.onUpdate}>
+				onUpdate={note.onUpdate}
+			>
 			</KanbanNote>
 		));
   	return (
@@ -220,7 +236,8 @@ class KanbanColumn extends React.Component {
 							<a
 								href="#"
 								className="btn btn-outline-primary"
-								onClick={this.handleNewNote}>
+								onClick={this.handleNewNote}
+							>
 								New Note
 							</a>
 						</div>
@@ -251,13 +268,13 @@ class KanbanBoard extends React.Component {
 		this.localStorageGet()
 	}
 
-	handleMove(id, noteText, toColumn) {
+	handleMove(id, note_text, to_column) {
 		let new_note_key = Date.now();
 		let new_note_object = {
 			key: new_note_key,
-			noteText: noteText,
+			noteText: note_text,
 			id: new_note_key,
-			columnId: toColumn,
+			columnId: to_column,
 			onDelete: this.handleDelete,
 			onMove: this.handleMove,
 			onUpdate: this.handleUpdate
@@ -293,13 +310,13 @@ class KanbanBoard extends React.Component {
 
 	}
 
-	handleNewNote(inColumn, noteText) {
+	handleNewNote(in_column, note_text) {
 		let new_note_key = Date.now();
 		let new_note_object = {
 			key: new_note_key,
-			noteText: noteText,
+			noteText: note_text,
 			id: new_note_key,
-			columnId: inColumn,
+			columnId: in_column,
 			onDelete: this.handleDelete,
 			onMove: this.handleMove,
 			onUpdate: this.handleUpdate
@@ -343,24 +360,23 @@ class KanbanBoard extends React.Component {
 						key="left"
 						columnId="left"
 						title="Todo"
-						onMove={this.handleMove}
 						newNote={this.handleNewNote}
-						notes={this.state.notes}>
-					</KanbanColumn>
+						notes={this.state.notes}
+					/>
 					<KanbanColumn
 						key="center"
 						columnId="center"
 						title="Pending"
 						newNote={this.handleNewNote}
-						notes={this.state.notes}>
-					</KanbanColumn>
+						notes={this.state.notes}
+					/>
 					<KanbanColumn
 						key="right"
 						columnId="right"
 						title="Done"
 						newNote={this.handleNewNote}
-						notes={this.state.notes}>
-					</KanbanColumn>
+						notes={this.state.notes}
+					/>
 				</div>
       </div>
     );
